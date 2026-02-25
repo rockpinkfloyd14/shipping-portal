@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://shipping-portal-two.vercel.app"),
   title: "Shipping Industry Portal | Synergy Capital",
   description: "Comprehensive shipping industry portal covering vessel types, major ports, freight rates, market data, shipbuilding, and industry forecasts. Powered by Synergy Capital.",
   keywords: "shipping, maritime, vessels, ports, freight rates, bulk carriers, tankers, container ships, LNG, shipbuilding, Synergy Capital",
@@ -20,6 +21,12 @@ export const metadata: Metadata = {
     title: "Shipping Industry Portal | Synergy Capital",
     description: "Your complete guide to the global shipping industry - vessel types, ports, routes, freight rates, market data, and forecasts.",
     type: "website",
+    siteName: "Synergy Capital",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shipping Industry Portal | Synergy Capital",
+    description: "Your complete guide to the global shipping industry - vessel types, ports, routes, freight rates, market data, and forecasts.",
   },
 };
 
