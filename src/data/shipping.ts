@@ -502,11 +502,11 @@ export interface FreightRate {
 }
 
 export const freightRates: FreightRate[] = [
-  { vessel: "Capesize", route: "Brazil-China", currentRate: "$22,500", unit: "/day", yearAgoRate: "$18,200", fiveYearAvg: "$19,800", trend: "up", percentChange: "+23.6%" },
-  { vessel: "Capesize", route: "Tubarao-Qingdao", currentRate: "$26.50", unit: "/tonne", yearAgoRate: "$21.80", fiveYearAvg: "$23.50", trend: "up", percentChange: "+21.6%" },
-  { vessel: "Panamax", route: "US Gulf-Japan", currentRate: "$15,800", unit: "/day", yearAgoRate: "$14,500", fiveYearAvg: "$13,200", trend: "up", percentChange: "+9.0%" },
-  { vessel: "Supramax", route: "SE Asia RV", currentRate: "$13,200", unit: "/day", yearAgoRate: "$11,800", fiveYearAvg: "$12,100", trend: "up", percentChange: "+11.9%" },
-  { vessel: "Handysize", route: "ECSA-Continent", currentRate: "$11,500", unit: "/day", yearAgoRate: "$10,200", fiveYearAvg: "$10,800", trend: "up", percentChange: "+12.7%" },
+  { vessel: "Capesize", route: "Brazil-China", currentRate: "$25,500", unit: "/day", yearAgoRate: "$12,000", fiveYearAvg: "$17,000", trend: "up", percentChange: "+112.5%" },
+  { vessel: "Capesize", route: "Tubarao-Qingdao", currentRate: "$25.00", unit: "/tonne", yearAgoRate: "$17.40", fiveYearAvg: "$21.00", trend: "up", percentChange: "+43.7%" },
+  { vessel: "Panamax", route: "US Gulf-Japan", currentRate: "$16,800", unit: "/day", yearAgoRate: "$10,200", fiveYearAvg: "$13,000", trend: "up", percentChange: "+64.7%" },
+  { vessel: "Supramax", route: "SE Asia RV", currentRate: "$12,500", unit: "/day", yearAgoRate: "$8,600", fiveYearAvg: "$10,800", trend: "up", percentChange: "+45.3%" },
+  { vessel: "Handysize", route: "ECSA-Continent", currentRate: "$13,000", unit: "/day", yearAgoRate: "$9,900", fiveYearAvg: "$10,500", trend: "up", percentChange: "+31.3%" },
   { vessel: "VLCC", route: "MEG-China", currentRate: "$42,000", unit: "/day", yearAgoRate: "$55,000", fiveYearAvg: "$38,000", trend: "down", percentChange: "-23.6%" },
   { vessel: "Suezmax", route: "WAF-UKC", currentRate: "$35,000", unit: "/day", yearAgoRate: "$45,000", fiveYearAvg: "$30,000", trend: "down", percentChange: "-22.2%" },
   { vessel: "Aframax", route: "Cross-Med", currentRate: "$28,000", unit: "/day", yearAgoRate: "$38,000", fiveYearAvg: "$25,000", trend: "down", percentChange: "-26.3%" },
