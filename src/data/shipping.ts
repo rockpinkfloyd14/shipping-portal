@@ -593,15 +593,15 @@ export interface ShippingCompany {
 }
 
 export const majorCompanies: ShippingCompany[] = [
-  { name: "A.P. Moller-Maersk", ticker: "MAERSK-B.CO", marketCap: "$26B", fleet: "700+ vessels", headquarters: "Copenhagen, Denmark", segment: "Container / Logistics", revenue: "$51B" },
   { name: "MSC (Mediterranean Shipping Co.)", ticker: "Private", marketCap: "~$80B (est.)", fleet: "800+ vessels", headquarters: "Geneva, Switzerland", segment: "Container", revenue: "$70B+" },
   { name: "CMA CGM", ticker: "Private", marketCap: "~$45B (est.)", fleet: "600+ vessels", headquarters: "Marseille, France", segment: "Container / Logistics", revenue: "$47B" },
-  { name: "COSCO Shipping", ticker: "1919.HK", marketCap: "$18B", fleet: "1,400+ vessels", headquarters: "Shanghai, China", segment: "Container / Bulk / Tanker", revenue: "$38B" },
   { name: "Hapag-Lloyd", ticker: "HLAG.DE", marketCap: "$32B", fleet: "260+ vessels", headquarters: "Hamburg, Germany", segment: "Container", revenue: "$36B" },
+  { name: "A.P. Moller-Maersk", ticker: "MAERSK-B.CO", marketCap: "$26B", fleet: "700+ vessels", headquarters: "Copenhagen, Denmark", segment: "Container / Logistics", revenue: "$51B" },
   { name: "Evergreen Marine", ticker: "2603.TW", marketCap: "$22B", fleet: "200+ vessels", headquarters: "Taipei, Taiwan", segment: "Container", revenue: "$18B" },
+  { name: "COSCO Shipping", ticker: "1919.HK", marketCap: "$18B", fleet: "1,400+ vessels", headquarters: "Shanghai, China", segment: "Container / Bulk / Tanker", revenue: "$38B" },
   { name: "Frontline", ticker: "FRO", marketCap: "$4.5B", fleet: "80+ tankers", headquarters: "Hamilton, Bermuda", segment: "Oil Tanker", revenue: "$2.5B" },
-  { name: "Star Bulk Carriers", ticker: "SBLK", marketCap: "$2.8B", fleet: "130+ vessels", headquarters: "Athens, Greece", segment: "Dry Bulk", revenue: "$1.8B" },
   { name: "Golden Ocean Group", ticker: "GOGL", marketCap: "$3.0B", fleet: "85+ vessels", headquarters: "Hamilton, Bermuda", segment: "Dry Bulk", revenue: "$1.5B" },
+  { name: "Star Bulk Carriers", ticker: "SBLK", marketCap: "$2.8B", fleet: "130+ vessels", headquarters: "Athens, Greece", segment: "Dry Bulk", revenue: "$1.8B" },
   { name: "Qatar Energy LNG", ticker: "State-owned", marketCap: "N/A", fleet: "70+ LNG carriers", headquarters: "Doha, Qatar", segment: "LNG", revenue: "$40B+" },
 ];
 
