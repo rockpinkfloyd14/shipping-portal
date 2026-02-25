@@ -66,15 +66,15 @@ export default function Navbar() {
         }`}
         style={{ borderBottom: "1px solid #E2E8F0" }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <Image
               src="/synergy_logo.png"
               alt="Synergy Capital"
-              width={120}
-              height={40}
-              className="h-10 w-auto object-contain"
+              width={180}
+              height={56}
+              className="h-14 w-auto object-contain"
               priority
             />
           </Link>
@@ -144,9 +144,9 @@ export default function Navbar() {
             <Image
               src="/synergy_logo.png"
               alt="Synergy Capital"
-              width={100}
-              height={34}
-              className="h-[34px] w-auto object-contain"
+              width={140}
+              height={44}
+              className="h-11 w-auto object-contain"
             />
           </Link>
           <button
