@@ -4,55 +4,34 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { commodityVolumes, majorCompanies } from "@/data/shipping";
+import { motion } from "framer-motion";
 import {
-  BarChart3,
-  Building2,
-  Globe,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import {
   TrendingUp,
   TrendingDown,
-  Activity,
-  Ship,
-  Boxes,
+  Building2,
+  Globe2,
   Users,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 
-// Country flag emoji helper
-const countryFlags: Record<string, string> = {
-  "Saudi Arabia": "SA",
-  Russia: "RU",
-  Iraq: "IQ",
-  USA: "US",
-  UAE: "AE",
-  China: "CN",
-  India: "IN",
-  Japan: "JP",
-  "South Korea": "KR",
-  Europe: "EU",
-  EU: "EU",
-  Australia: "AU",
-  Brazil: "BR",
-  "South Africa": "ZA",
-  Indonesia: "ID",
-  Colombia: "CO",
-  Vietnam: "VN",
-  Qatar: "QA",
-  Malaysia: "MY",
-  Argentina: "AR",
-  Ukraine: "UA",
-  Canada: "CA",
-  Mexico: "MX",
-  Egypt: "EG",
-  Germany: "DE",
-  "Southeast Asia": "ASEAN",
-  Africa: "AF",
-  "Latin America": "LATAM",
-  Netherlands: "NL",
-  "Middle East": "ME",
-};
+/* ------------------------------------------------------------------ */
+/*  Static data                                                        */
+/* ------------------------------------------------------------------ */
 
-// Market indices data
+// Market indices
 const marketIndices = [
   {
     name: "Baltic Dry Index (BDI)",
@@ -85,19 +64,19 @@ const marketIndices = [
     name: "Shanghai Containerized Freight Index (SCFI)",
     value: "~1,050",
     description:
-      "Measures spot freight rates from Shanghai to 15 major global destinations. Published weekly by the Shanghai Shipping Exchange. The most watched index for container spot market trends, especially Asia-outbound trade.",
+      "Measures spot freight rates from Shanghai to 15 major global destinations. Published weekly by the Shanghai Shipping Exchange. The most watched index for container spot market trends.",
     measures: "Container Spot Freight Rates",
     range: "400 (2020 low) - 5,100 (2022 high)",
     color: "#27AE60",
   },
 ];
 
-// Shipping alliances data
+// Shipping alliances
 const shippingAlliances = [
   {
     name: "Ocean Alliance",
     members: ["CMA CGM", "COSCO", "Evergreen", "OOCL"],
-    capacityShare: "~29%",
+    capacityShare: 29,
     description:
       "Active since 2017, renewed through 2032. Members operate joint services across Asia-Europe, Transpacific, and Transatlantic trades. COSCO acquired OOCL in 2018, keeping it as a separate brand within the alliance.",
     color: "#2980B9",
@@ -105,7 +84,7 @@ const shippingAlliances = [
   {
     name: "Gemini Cooperation",
     members: ["Maersk", "Hapag-Lloyd"],
-    capacityShare: "~22%",
+    capacityShare: 22,
     description:
       "Launched in February 2025, replacing the dissolved 2M alliance (Maersk + MSC). Focuses on a hub-and-spoke network model with fewer direct port calls but higher reliability. Aims for 90%+ schedule reliability.",
     color: "#E8943A",
@@ -113,14 +92,21 @@ const shippingAlliances = [
   {
     name: "MSC (Independent)",
     members: ["MSC"],
-    capacityShare: "~20%",
+    capacityShare: 20,
     description:
-      "After leaving the 2M alliance, MSC now operates independently as the world's largest container line by capacity. Has aggressively expanded fleet through secondhand acquisitions and massive newbuild orders. Pursuing a standalone global network strategy.",
+      "After leaving the 2M alliance, MSC now operates independently as the world's largest container line by capacity. Has aggressively expanded fleet through secondhand acquisitions and massive newbuild orders.",
     color: "#E85D5D",
   },
 ];
 
-// Sort companies by parsing market cap
+const alliancePieData = [
+  { name: "Ocean Alliance", value: 29, color: "#2980B9" },
+  { name: "Gemini Cooperation", value: 22, color: "#E8943A" },
+  { name: "MSC Independent", value: 20, color: "#E85D5D" },
+  { name: "Others", value: 29, color: "#94A3B8" },
+];
+
+// Sort companies by market cap
 function parseMarketCap(cap: string): number {
   const cleaned = cap.replace(/[~$B(est.)]/g, "").trim();
   const num = parseFloat(cleaned);
@@ -131,8 +117,57 @@ const sortedCompanies = [...majorCompanies].sort(
   (a, b) => parseMarketCap(b.marketCap) - parseMarketCap(a.marketCap)
 );
 
-// Find max volume for bar scaling
-const maxVolume = Math.max(...commodityVolumes.map((c) => c.volumeNumber));
+// Commodity chart data (sorted by volume descending)
+const commodityChartData = [...commodityVolumes]
+  .sort((a, b) => b.volumeNumber - a.volumeNumber)
+  .map((c) => ({
+    name: c.commodity,
+    volume: c.volumeNumber,
+    unit: c.unit,
+  }));
+
+/* ------------------------------------------------------------------ */
+/*  Framer-motion variants                                             */
+/* ------------------------------------------------------------------ */
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" as const },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, delay: i * 0.08, ease: "easeOut" as const },
+  }),
+};
+
+/* ------------------------------------------------------------------ */
+/*  Custom tooltip for the commodity chart                             */
+/* ------------------------------------------------------------------ */
+
+function CommodityTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-3 shadow-lg">
+      <p className="text-sm font-semibold text-[#0F172A]">{d.name}</p>
+      <p className="text-sm text-[#475569]">
+        {d.volume.toLocaleString()} {d.unit}
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page component                                                     */
+/* ------------------------------------------------------------------ */
 
 export default function MarketPage() {
   const [expandedCommodity, setExpandedCommodity] = useState<number | null>(
@@ -141,64 +176,118 @@ export default function MarketPage() {
   const [showAllCompanies, setShowAllCompanies] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0A1628]">
+    <div className="min-h-screen" style={{ backgroundColor: "#F8FAFC" }}>
       <Navbar />
 
-      {/* Hero Header */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#152952] via-[#0F1F3D] to-[#0A1628]" />
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#2980B9] rounded-full blur-[128px]" />
-          <div className="absolute bottom-10 right-20 w-96 h-96 bg-[#E8943A] rounded-full blur-[128px]" />
+      {/* ── Hero Header ── */}
+      <section className="relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #E2E8F0" }}>
+        <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute top-10 left-10 w-72 h-72 rounded-full bg-[#E8943A] blur-[120px]" />
+          <div className="absolute bottom-0 right-20 w-96 h-96 rounded-full bg-[#2980B9] blur-[120px]" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#E8943A]/10 border border-[#E8943A]/20">
-              <Globe className="w-6 h-6 text-[#E8943A]" />
-            </div>
-            <div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#E8943A]/10 border border-[#E8943A]/20">
+                <Globe2 className="w-6 h-6 text-[#E8943A]" />
+              </div>
               <p className="text-[#E8943A] text-sm font-semibold uppercase tracking-wider">
                 Market Intelligence
               </p>
             </div>
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#F8FAFC] mb-4">
-            Shipping Market Overview
-          </h1>
-          <p className="text-lg text-[#94A3B8] max-w-3xl">
-            Comprehensive data on global commodity flows, major shipping
-            companies, alliance structures, and key market indices that drive the
-            maritime industry.
-          </p>
+            <h1 className="text-4xl sm:text-5xl font-bold text-[#0F172A] mb-4">
+              Shipping Market Overview
+            </h1>
+            <p className="text-lg text-[#475569] max-w-3xl">
+              Comprehensive data on global commodity flows, major shipping
+              companies, alliance structures, and key market indices that drive
+              the maritime industry.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Section A: Commodities Shipped by Volume */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#2980B9]/10 border border-[#2980B9]/20">
-            <Boxes className="w-5 h-5 text-[#2980B9]" />
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#F8FAFC]">
-            Commodities Shipped by Volume
-          </h2>
+      {/* ── Section A: Commodities Chart ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] mb-2">
+          Commodities Shipped by Volume
+        </h2>
+        <p className="text-[#475569] mb-8 text-sm">
+          Annual seaborne trade volumes across major commodity categories.
+        </p>
+
+        {/* Horizontal Bar Chart */}
+        <div
+          className="rounded-2xl border p-6 mb-8"
+          style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
+        >
+          <ResponsiveContainer width="100%" height={420}>
+            <BarChart
+              data={commodityChartData}
+              layout="vertical"
+              margin={{ top: 4, right: 30, left: 10, bottom: 4 }}
+            >
+              <defs>
+                <linearGradient id="orangeBar" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#E8943A" />
+                  <stop offset="100%" stopColor="#F4B76E" />
+                </linearGradient>
+              </defs>
+              <XAxis
+                type="number"
+                tick={{ fill: "#94A3B8", fontSize: 12 }}
+                axisLine={{ stroke: "#E2E8F0" }}
+                tickLine={false}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={130}
+                tick={{ fill: "#475569", fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip content={<CommodityTooltip />} cursor={{ fill: "#F1F5F9" }} />
+              <Bar
+                dataKey="volume"
+                fill="url(#orangeBar)"
+                radius={[0, 6, 6, 0]}
+                barSize={26}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Expandable commodity cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {commodityVolumes.map((commodity, index) => {
             const isPositive = commodity.growth.startsWith("+");
-            const barWidth = (commodity.volumeNumber / maxVolume) * 100;
             const isExpanded = expandedCommodity === index;
 
             return (
-              <div
+              <motion.div
                 key={commodity.commodity}
-                className="bg-[#0F1F3D] border border-white/5 rounded-2xl p-6 hover:border-[#2980B9]/30 transition-all duration-300"
+                custom={index}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                className="rounded-2xl border p-6 transition-shadow duration-300 hover:shadow-md"
+                style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
               >
-                {/* Header Row */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-[#F8FAFC] mb-1">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#0F172A]">
                       {commodity.commodity}
                     </h3>
                     <p className="text-sm text-[#94A3B8]">
@@ -206,67 +295,49 @@ export default function MarketPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-[#F8FAFC]">
+                    <p className="text-2xl font-bold text-[#0F172A]">
                       {commodity.annualVolume}
-                    </div>
-                    <div className="text-sm text-[#94A3B8]">
+                    </p>
+                    <p className="text-xs text-[#94A3B8]">
                       {commodity.unit}/year
-                    </div>
+                    </p>
                   </div>
                 </div>
 
-                {/* Volume Bar */}
-                <div className="mb-4">
-                  <div className="w-full h-3 bg-[#0A1628] rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out"
-                      style={{
-                        width: `${barWidth}%`,
-                        background: `linear-gradient(90deg, #2980B9, ${isPositive ? "#27AE60" : "#E85D5D"})`,
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-xs text-[#94A3B8]">
-                      {barWidth.toFixed(0)}% of max volume
-                    </span>
-                    <span
-                      className={`text-sm font-semibold flex items-center gap-1 ${
-                        isPositive ? "text-emerald-400" : "text-red-400"
-                      }`}
-                    >
-                      {isPositive ? (
-                        <TrendingUp className="w-3.5 h-3.5" />
-                      ) : (
-                        <TrendingDown className="w-3.5 h-3.5" />
-                      )}
-                      {commodity.growth} growth
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between mb-1">
+                  <span
+                    className={`text-sm font-semibold flex items-center gap-1 ${
+                      isPositive ? "text-emerald-600" : "text-[#E85D5D]"
+                    }`}
+                  >
+                    {isPositive ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4" />
+                    )}
+                    {commodity.growth} growth
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      setExpandedCommodity(isExpanded ? null : index)
+                    }
+                    className="flex items-center gap-1 text-sm text-[#2980B9] hover:text-[#E8943A] transition-colors"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp className="w-4 h-4" /> Hide
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4" /> Trade flows
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                {/* Expand/Collapse Button */}
-                <button
-                  onClick={() =>
-                    setExpandedCommodity(isExpanded ? null : index)
-                  }
-                  className="flex items-center gap-1 text-sm text-[#2980B9] hover:text-[#E8943A] transition-colors mb-2"
-                >
-                  {isExpanded ? (
-                    <>
-                      <ChevronUp className="w-4 h-4" /> Hide details
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" /> Show trade flows
-                    </>
-                  )}
-                </button>
-
-                {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-white/5 space-y-3 animate-in fade-in duration-200">
-                    {/* Top Exporters */}
+                  <div className="mt-4 pt-4 space-y-3" style={{ borderTop: "1px solid #E2E8F0" }}>
                     <div>
                       <p className="text-xs text-[#94A3B8] uppercase tracking-wider mb-2">
                         Top Exporters
@@ -275,18 +346,14 @@ export default function MarketPage() {
                         {commodity.topExporters.map((country) => (
                           <span
                             key={country}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#152952] border border-[#2980B9]/20 rounded-full text-xs font-medium text-[#F8FAFC]"
+                            className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#0F172A] border"
+                            style={{ borderColor: "#E2E8F0", backgroundColor: "#F1F5F9" }}
                           >
-                            <span className="text-[#94A3B8]">
-                              {countryFlags[country] || ""}
-                            </span>
                             {country}
                           </span>
                         ))}
                       </div>
                     </div>
-
-                    {/* Top Importers */}
                     <div>
                       <p className="text-xs text-[#94A3B8] uppercase tracking-wider mb-2">
                         Top Importers
@@ -295,11 +362,9 @@ export default function MarketPage() {
                         {commodity.topImporters.map((country) => (
                           <span
                             key={country}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#152952] border border-[#E8943A]/20 rounded-full text-xs font-medium text-[#F8FAFC]"
+                            className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#0F172A] border"
+                            style={{ borderColor: "#E8943A40", backgroundColor: "#FFF7ED" }}
                           >
-                            <span className="text-[#94A3B8]">
-                              {countryFlags[country] || ""}
-                            </span>
                             {country}
                           </span>
                         ))}
@@ -307,95 +372,85 @@ export default function MarketPage() {
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Section B: Major Shipping Companies */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* ── Section B: Major Shipping Companies ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
         <div className="flex items-center gap-3 mb-8">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#E8943A]/10 border border-[#E8943A]/20">
             <Building2 className="w-5 h-5 text-[#E8943A]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#F8FAFC]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A]">
             Major Shipping Companies
           </h2>
         </div>
 
         {/* Desktop Table */}
-        <div className="hidden lg:block overflow-x-auto">
+        <div
+          className="hidden lg:block rounded-2xl border overflow-hidden"
+          style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
+        >
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  #
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Company
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Ticker
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Market Cap
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Revenue
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Fleet
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  HQ
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">
-                  Segment
-                </th>
+              <tr style={{ borderBottom: "2px solid #E2E8F0" }}>
+                {["Rank", "Company", "Ticker", "Market Cap", "Revenue", "Fleet", "HQ", "Segment"].map(
+                  (col) => (
+                    <th
+                      key={col}
+                      className="text-left py-3.5 px-5 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]"
+                    >
+                      {col}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
               {sortedCompanies.map((company, index) => (
                 <tr
                   key={company.name}
-                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                  className="transition-colors hover:bg-[#F8FAFC]"
+                  style={{
+                    borderBottom: "1px solid #E2E8F0",
+                    backgroundColor: index % 2 === 1 ? "#F8FAFC" : "#FFFFFF",
+                  }}
                 >
-                  <td className="py-4 px-4 text-sm text-[#94A3B8]">
+                  <td className="py-4 px-5 text-sm font-medium text-[#94A3B8]">
                     {index + 1}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm font-semibold text-[#F8FAFC]">
-                      {company.name}
-                    </span>
+                  <td className="py-4 px-5 text-sm font-semibold text-[#0F172A]">
+                    {company.name}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm text-[#2980B9] font-mono">
-                      {company.ticker}
-                    </span>
+                  <td className="py-4 px-5 text-sm font-mono text-[#2980B9]">
+                    {company.ticker}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm font-semibold text-[#E8943A]">
-                      {company.marketCap}
-                    </span>
+                  <td className="py-4 px-5 text-sm font-semibold text-[#E8943A]">
+                    {company.marketCap}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm text-[#F8FAFC]">
-                      {company.revenue}
-                    </span>
+                  <td className="py-4 px-5 text-sm text-[#0F172A]">
+                    {company.revenue}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm text-[#94A3B8]">
-                      {company.fleet}
-                    </span>
+                  <td className="py-4 px-5 text-sm text-[#475569]">
+                    {company.fleet}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-sm text-[#94A3B8]">
-                      {company.headquarters}
-                    </span>
+                  <td className="py-4 px-5 text-sm text-[#475569]">
+                    {company.headquarters}
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="inline-flex px-2.5 py-1 bg-[#152952] border border-white/5 rounded-full text-xs font-medium text-[#F8FAFC]">
+                  <td className="py-4 px-5">
+                    <span
+                      className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#0F172A]"
+                      style={{ backgroundColor: "#F1F5F9", border: "1px solid #E2E8F0" }}
+                    >
                       {company.segment}
                     </span>
                   </td>
@@ -406,26 +461,35 @@ export default function MarketPage() {
         </div>
 
         {/* Mobile Cards */}
-        <div className="lg:hidden space-y-4">
+        <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
           {(showAllCompanies
             ? sortedCompanies
             : sortedCompanies.slice(0, 5)
           ).map((company, index) => (
-            <div
+            <motion.div
               key={company.name}
-              className="bg-[#0F1F3D] border border-white/5 rounded-2xl p-5"
+              custom={index}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="rounded-2xl border p-5"
+              style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-[#94A3B8] bg-[#0A1628] px-2 py-0.5 rounded-full">
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full text-[#475569]"
+                      style={{ backgroundColor: "#F1F5F9" }}
+                    >
                       #{index + 1}
                     </span>
                     <span className="text-sm font-mono text-[#2980B9]">
                       {company.ticker}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-[#F8FAFC]">
+                  <h3 className="text-lg font-bold text-[#0F172A]">
                     {company.name}
                   </h3>
                 </div>
@@ -437,39 +501,45 @@ export default function MarketPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5">
+              <div
+                className="grid grid-cols-2 gap-3 pt-3"
+                style={{ borderTop: "1px solid #E2E8F0" }}
+              >
                 <div>
                   <p className="text-xs text-[#94A3B8]">Revenue</p>
-                  <p className="text-sm font-semibold text-[#F8FAFC]">
+                  <p className="text-sm font-semibold text-[#0F172A]">
                     {company.revenue}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-[#94A3B8]">Fleet Size</p>
-                  <p className="text-sm font-semibold text-[#F8FAFC]">
+                  <p className="text-sm font-semibold text-[#0F172A]">
                     {company.fleet}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-[#94A3B8]">Headquarters</p>
-                  <p className="text-sm text-[#F8FAFC]">
+                  <p className="text-sm text-[#475569]">
                     {company.headquarters}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-[#94A3B8]">Segment</p>
-                  <span className="inline-flex px-2.5 py-1 bg-[#152952] border border-white/5 rounded-full text-xs font-medium text-[#F8FAFC]">
+                  <span
+                    className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#0F172A]"
+                    style={{ backgroundColor: "#F1F5F9", border: "1px solid #E2E8F0" }}
+                  >
                     {company.segment}
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
 
           {sortedCompanies.length > 5 && (
             <button
               onClick={() => setShowAllCompanies(!showAllCompanies)}
-              className="w-full py-3 text-sm font-medium text-[#2980B9] hover:text-[#E8943A] transition-colors"
+              className="col-span-full py-3 text-sm font-medium text-[#2980B9] hover:text-[#E8943A] transition-colors"
             >
               {showAllCompanies
                 ? "Show fewer companies"
@@ -477,50 +547,63 @@ export default function MarketPage() {
             </button>
           )}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Section C: Shipping Alliances */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* ── Section C: Shipping Alliances ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
         <div className="flex items-center gap-3 mb-4">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#E85D5D]/10 border border-[#E85D5D]/20">
             <Users className="w-5 h-5 text-[#E85D5D]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#F8FAFC]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A]">
             Shipping Alliances
           </h2>
         </div>
 
-        <p className="text-[#94A3B8] mb-8 max-w-3xl text-sm leading-relaxed">
+        <p className="text-[#475569] mb-8 max-w-3xl text-sm leading-relaxed">
           Shipping alliances are agreements between container carriers to share
           vessel capacity on major trade routes. By pooling ships and
           coordinating schedules, alliance members can offer broader network
-          coverage, more frequent sailings, and better port coverage than any
-          single carrier could achieve alone. Alliances collectively control over
-          70% of global container capacity, significantly influencing freight
-          rates, service availability, and supply chain reliability.
+          coverage and more frequent sailings. Alliances collectively control
+          over 70% of global container capacity.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {shippingAlliances.map((alliance) => (
-            <div
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {shippingAlliances.map((alliance, i) => (
+            <motion.div
               key={alliance.name}
-              className="bg-[#0F1F3D] border border-white/5 rounded-2xl p-6 relative overflow-hidden"
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="rounded-2xl border p-6 relative overflow-hidden"
+              style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
             >
-              {/* Accent bar */}
+              {/* Top accent bar */}
               <div
-                className="absolute top-0 left-0 right-0 h-1"
+                className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
                 style={{ backgroundColor: alliance.color }}
               />
 
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 mt-1">
                 <h3
                   className="text-xl font-bold"
                   style={{ color: alliance.color }}
                 >
                   {alliance.name}
                 </h3>
-                <span className="text-sm font-bold text-[#F8FAFC] bg-[#0A1628] px-3 py-1 rounded-full">
-                  {alliance.capacityShare}
+                <span
+                  className="text-sm font-bold px-3 py-1 rounded-full"
+                  style={{ backgroundColor: "#F1F5F9", color: "#0F172A" }}
+                >
+                  ~{alliance.capacityShare}%
                 </span>
               </div>
 
@@ -528,10 +611,11 @@ export default function MarketPage() {
                 {alliance.members.map((member) => (
                   <span
                     key={member}
-                    className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#F8FAFC] border"
+                    className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium border"
                     style={{
+                      color: alliance.color,
                       borderColor: `${alliance.color}40`,
-                      backgroundColor: `${alliance.color}15`,
+                      backgroundColor: `${alliance.color}10`,
                     }}
                   >
                     {member}
@@ -539,101 +623,110 @@ export default function MarketPage() {
                 ))}
               </div>
 
-              <p className="text-sm text-[#94A3B8] leading-relaxed">
+              <p className="text-sm text-[#475569] leading-relaxed">
                 {alliance.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Capacity Distribution Bar */}
-        <div className="mt-8 bg-[#0F1F3D] border border-white/5 rounded-2xl p-6">
+        {/* Alliance PieChart */}
+        <div
+          className="rounded-2xl border p-6"
+          style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
+        >
           <h3 className="text-sm font-semibold text-[#94A3B8] uppercase tracking-wider mb-4">
             Global Container Capacity Distribution
           </h3>
-          <div className="flex h-8 rounded-full overflow-hidden">
-            {shippingAlliances.map((alliance) => {
-              const share = parseInt(
-                alliance.capacityShare.replace(/[~%]/g, "")
-              );
-              return (
-                <div
-                  key={alliance.name}
-                  className="flex items-center justify-center transition-all duration-300 hover:opacity-80"
-                  style={{
-                    width: `${share}%`,
-                    backgroundColor: alliance.color,
-                  }}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie
+                  data={alliancePieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={130}
+                  paddingAngle={3}
+                  dataKey="value"
+                  stroke="none"
                 >
-                  <span className="text-xs font-bold text-white truncate px-2">
-                    {alliance.name.split(" ")[0]} {alliance.capacityShare}
-                  </span>
-                </div>
-              );
-            })}
-            <div
-              className="flex items-center justify-center bg-[#94A3B8]/30"
-              style={{ width: "29%" }}
-            >
-              <span className="text-xs font-bold text-[#F8FAFC] truncate px-2">
-                Others ~29%
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-4 mt-3">
-            {shippingAlliances.map((alliance) => (
-              <div key={alliance.name} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: alliance.color }}
+                  {alliancePieData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value) => [`${value}%`, "Share"]}
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                  }}
                 />
-                <span className="text-xs text-[#94A3B8]">{alliance.name}</span>
-              </div>
-            ))}
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#94A3B8]/30" />
-              <span className="text-xs text-[#94A3B8]">
-                Non-Alliance / Regional Carriers
-              </span>
-            </div>
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  iconSize={10}
+                  formatter={(value: string) => (
+                    <span style={{ color: "#475569", fontSize: "13px" }}>
+                      {value}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Section D: Key Market Indices */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* ── Section D: Key Market Indices ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
         <div className="flex items-center gap-3 mb-8">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-            <Activity className="w-5 h-5 text-emerald-400" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#2980B9]/10 border border-[#2980B9]/20">
+            <TrendingUp className="w-5 h-5 text-[#2980B9]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#F8FAFC]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A]">
             Key Market Indices
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {marketIndices.map((indexData) => (
-            <div
+          {marketIndices.map((indexData, i) => (
+            <motion.div
               key={indexData.name}
-              className="bg-[#0F1F3D] border border-white/5 rounded-2xl p-6 relative overflow-hidden"
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="rounded-2xl border p-6 relative overflow-hidden"
+              style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
             >
               {/* Left accent border */}
               <div
-                className="absolute top-0 left-0 bottom-0 w-1"
+                className="absolute top-0 left-0 bottom-0 w-1 rounded-l-2xl"
                 style={{ backgroundColor: indexData.color }}
               />
 
               <div className="pl-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="text-lg font-bold text-[#F8FAFC] mb-1">
+                    <h3 className="text-lg font-bold text-[#0F172A] mb-1">
                       {indexData.name}
                     </h3>
                     <span
                       className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium"
                       style={{
                         color: indexData.color,
-                        backgroundColor: `${indexData.color}15`,
+                        backgroundColor: `${indexData.color}12`,
                         border: `1px solid ${indexData.color}30`,
                       }}
                     >
@@ -647,56 +740,34 @@ export default function MarketPage() {
                     >
                       {indexData.value}
                     </div>
-                    <div className="text-xs text-[#94A3B8]">Current (approx.)</div>
+                    <div className="text-xs text-[#94A3B8]">
+                      Current (approx.)
+                    </div>
                   </div>
                 </div>
 
-                <p className="text-sm text-[#94A3B8] leading-relaxed mb-3">
+                <p className="text-sm text-[#475569] leading-relaxed mb-3">
                   {indexData.description}
                 </p>
 
-                <div className="pt-3 border-t border-white/5">
+                <div
+                  className="pt-3"
+                  style={{ borderTop: "1px solid #E2E8F0" }}
+                >
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-[#94A3B8]">
                       Historical Range
                     </span>
-                    <span className="text-xs font-mono text-[#F8FAFC]">
+                    <span className="text-xs font-mono text-[#0F172A]">
                       {indexData.range}
                     </span>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-
-        {/* Additional context */}
-        <div className="mt-8 bg-[#0F1F3D] border border-white/5 rounded-2xl p-6">
-          <div className="flex items-start gap-3">
-            <BarChart3 className="w-5 h-5 text-[#E8943A] mt-0.5 shrink-0" />
-            <div>
-              <h3 className="text-sm font-semibold text-[#F8FAFC] mb-2">
-                How to Read These Indices
-              </h3>
-              <p className="text-sm text-[#94A3B8] leading-relaxed">
-                Shipping indices are critical barometers for the global economy.
-                The <strong className="text-[#F8FAFC]">Baltic Dry Index</strong>{" "}
-                is often called a &ldquo;leading economic indicator&rdquo;
-                because it reflects real-time demand for raw materials shipped by
-                sea. The{" "}
-                <strong className="text-[#F8FAFC]">ClarkSea Index</strong>{" "}
-                provides the broadest view across all segments. Container
-                indices like{" "}
-                <strong className="text-[#F8FAFC]">Harpex</strong> and{" "}
-                <strong className="text-[#F8FAFC]">SCFI</strong> focus
-                specifically on the consumer goods supply chain. Together, they
-                paint a comprehensive picture of maritime trade health and
-                direction.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      </motion.section>
 
       <Footer />
     </div>

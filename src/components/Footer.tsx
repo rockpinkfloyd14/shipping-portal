@@ -1,237 +1,157 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
   Ship,
   Anchor,
-  Globe,
+  Globe2,
   TrendingUp,
   Factory,
   BarChart3,
   Navigation,
-  Linkedin,
-  Twitter,
-  Mail,
 } from "lucide-react";
 
-interface FooterLink {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-}
-
-const quickLinks: FooterLink[] = [
-  { label: "Home", href: "/", icon: <Navigation className="w-4 h-4" /> },
-  { label: "Vessels", href: "/vessels", icon: <Ship className="w-4 h-4" /> },
-  {
-    label: "Ports & Routes",
-    href: "/ports-routes",
-    icon: <Anchor className="w-4 h-4" />,
-  },
-  { label: "Market", href: "/market", icon: <Globe className="w-4 h-4" /> },
-  {
-    label: "Freight",
-    href: "/freight",
-    icon: <TrendingUp className="w-4 h-4" />,
-  },
-  {
-    label: "Shipbuilding",
-    href: "/shipbuilding",
-    icon: <Factory className="w-4 h-4" />,
-  },
-  {
-    label: "Forecasts",
-    href: "/forecasts",
-    icon: <BarChart3 className="w-4 h-4" />,
-  },
-];
-
-const socialLinks = [
-  {
-    label: "LinkedIn",
-    href: "#",
-    icon: <Linkedin className="w-5 h-5" />,
-  },
-  {
-    label: "Twitter",
-    href: "#",
-    icon: <Twitter className="w-5 h-5" />,
-  },
-  {
-    label: "Email",
-    href: "#",
-    icon: <Mail className="w-5 h-5" />,
-  },
+const quickLinks = [
+  { href: "/", label: "Home", icon: Ship },
+  { href: "/vessels", label: "Vessels", icon: Anchor },
+  { href: "/ports", label: "Ports & Routes", icon: Globe2 },
+  { href: "/market", label: "Market", icon: TrendingUp },
+  { href: "/freight", label: "Freight", icon: Navigation },
+  { href: "/shipbuilding", label: "Shipbuilding", icon: Factory },
+  { href: "/forecasts", label: "Forecasts", icon: BarChart3 },
 ];
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#0A1628]">
-      {/* Orange gradient accent line at top */}
-      <div className="h-1 w-full bg-gradient-to-r from-[#E8943A] via-[#E85D5D] to-[#E8943A]" />
+    <footer className="w-full">
+      {/* Orange gradient accent line */}
+      <div
+        className="h-[2px] w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, #E8943A 0%, #F4B76E 50%, #E8943A 100%)",
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand Column */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3 mb-4">
-              <Image
-                src="/synergy_logo.png"
-                alt="Synergy Capital"
-                width={36}
-                height={36}
-                className="h-9 w-auto"
-              />
-              <span className="text-[#F8FAFC] font-semibold text-lg">
-                Synergy Capital
-              </span>
-            </Link>
-            <p className="text-[#94A3B8] text-sm leading-relaxed mb-6">
-              Comprehensive shipping intelligence and market analytics for the
-              global maritime industry. Real-time data, forecasts, and insights
-              to drive informed decisions.
-            </p>
-
-            {/* Social Links */}
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 text-[#94A3B8] hover:text-[#E8943A] hover:bg-[#E8943A]/10 transition-all duration-200"
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {social.icon}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Links Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-[#F8FAFC] font-semibold text-sm uppercase tracking-wider mb-4">
-              Quick Links
-            </h3>
-            <ul className="space-y-2">
-              {quickLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="flex items-center gap-2 text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200 group"
-                  >
-                    <span className="text-[#94A3B8] group-hover:text-[#E8943A] transition-colors duration-200">
-                      {link.icon}
-                    </span>
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-[#F8FAFC] font-semibold text-sm uppercase tracking-wider mb-4">
-              Resources
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/market"
-                  className="text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200"
-                >
-                  Market Overview
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/freight"
-                  className="text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200"
-                >
-                  Freight Rates
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/forecasts"
-                  className="text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200"
-                >
-                  Industry Forecasts
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/vessels"
-                  className="text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200"
-                >
-                  Vessel Tracking
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/shipbuilding"
-                  className="text-[#94A3B8] hover:text-[#E8943A] text-sm transition-colors duration-200"
-                >
-                  Shipbuilding Orders
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact / Powered By Column */}
-          <div className="lg:col-span-1">
-            <h3 className="text-[#F8FAFC] font-semibold text-sm uppercase tracking-wider mb-4">
-              About
-            </h3>
-            <div className="space-y-4">
-              <p className="text-[#94A3B8] text-sm leading-relaxed">
+      {/* Main footer */}
+      <div
+        className="w-full"
+        style={{ backgroundColor: "#F1F5F9", borderTop: "1px solid #E2E8F0" }}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {/* ── Brand column ── */}
+            <div className="flex flex-col gap-4">
+              <Link href="/" className="inline-flex items-center gap-3">
+                <Image
+                  src="/synergy_logo.png"
+                  alt="Synergy Capital"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                />
+              </Link>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: "#0F172A" }}
+              >
+                Shipping Industry Portal
+              </h3>
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: "#475569" }}
+              >
+                Comprehensive shipping market data, vessel tracking, freight
+                analytics, and industry forecasts — all in one place.
+              </p>
+              <p className="text-sm font-medium" style={{ color: "#475569" }}>
                 Powered by{" "}
                 <a
                   href="https://synergycapital.co.uk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#E8943A] hover:text-[#E85D5D] font-medium transition-colors duration-200 underline underline-offset-2"
+                  className="underline underline-offset-2 transition-colors hover:text-[#D47D2A]"
+                  style={{ color: "#E8943A" }}
                 >
                   Synergy Capital
                 </a>
               </p>
-              <p className="text-[#94A3B8] text-sm leading-relaxed">
-                Delivering cutting-edge analytics and intelligence for the
-                global shipping and maritime sector.
-              </p>
             </div>
-          </div>
-        </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-[#94A3B8] text-xs">
-              &copy; 2025 Synergy Capital. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <a
-                href="#"
-                className="text-[#94A3B8] hover:text-[#F8FAFC] text-xs transition-colors duration-200"
+            {/* ── Quick Links column ── */}
+            <div>
+              <h4
+                className="text-sm font-semibold uppercase tracking-wider mb-4"
+                style={{ color: "#0F172A" }}
               >
-                Privacy Policy
-              </a>
-              <a
-                href="#"
-                className="text-[#94A3B8] hover:text-[#F8FAFC] text-xs transition-colors duration-200"
+                Quick Links
+              </h4>
+              <ul className="flex flex-col gap-2">
+                {quickLinks.map(({ href, label, icon: Icon }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="group inline-flex items-center gap-2 text-sm transition-colors duration-200 hover:text-[#E8943A]"
+                      style={{ color: "#475569" }}
+                    >
+                      <Icon
+                        size={15}
+                        strokeWidth={1.8}
+                        className="transition-colors duration-200 group-hover:text-[#E8943A]"
+                      />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ── About column ── */}
+            <div>
+              <h4
+                className="text-sm font-semibold uppercase tracking-wider mb-4"
+                style={{ color: "#0F172A" }}
               >
-                Terms of Service
-              </a>
+                About
+              </h4>
+              <p
+                className="text-sm leading-relaxed mb-4"
+                style={{ color: "#475569" }}
+              >
+                Synergy Capital delivers institutional-grade shipping market
+                intelligence and analytics to industry professionals worldwide.
+              </p>
               <a
                 href="https://synergycapital.co.uk"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#94A3B8] hover:text-[#E8943A] text-xs transition-colors duration-200"
+                className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 hover:text-[#D47D2A]"
+                style={{ color: "#E8943A" }}
               >
                 synergycapital.co.uk
+                <span aria-hidden="true">&rarr;</span>
               </a>
             </div>
+          </div>
+
+          {/* ── Bottom bar ── */}
+          <div
+            className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+            style={{ borderTop: "1px solid #E2E8F0" }}
+          >
+            <p className="text-xs" style={{ color: "#94A3B8" }}>
+              &copy; 2025 Synergy Capital. All rights reserved.
+            </p>
+            <a
+              href="https://synergycapital.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs transition-colors duration-200 hover:text-[#E8943A]"
+              style={{ color: "#94A3B8" }}
+            >
+              synergycapital.co.uk
+            </a>
           </div>
         </div>
       </div>

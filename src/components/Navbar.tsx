@@ -9,43 +9,21 @@ import {
   X,
   Ship,
   Anchor,
-  Globe,
+  Globe2,
   TrendingUp,
   Factory,
   BarChart3,
   Navigation,
 } from "lucide-react";
 
-interface NavLink {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-}
-
-const navLinks: NavLink[] = [
-  { label: "Home", href: "/", icon: <Navigation className="w-4 h-4" /> },
-  { label: "Vessels", href: "/vessels", icon: <Ship className="w-4 h-4" /> },
-  {
-    label: "Ports & Routes",
-    href: "/ports-routes",
-    icon: <Anchor className="w-4 h-4" />,
-  },
-  { label: "Market", href: "/market", icon: <Globe className="w-4 h-4" /> },
-  {
-    label: "Freight",
-    href: "/freight",
-    icon: <TrendingUp className="w-4 h-4" />,
-  },
-  {
-    label: "Shipbuilding",
-    href: "/shipbuilding",
-    icon: <Factory className="w-4 h-4" />,
-  },
-  {
-    label: "Forecasts",
-    href: "/forecasts",
-    icon: <BarChart3 className="w-4 h-4" />,
-  },
+const navLinks = [
+  { href: "/", label: "Home", icon: Ship },
+  { href: "/vessels", label: "Vessels", icon: Anchor },
+  { href: "/ports", label: "Ports & Routes", icon: Globe2 },
+  { href: "/market", label: "Market", icon: TrendingUp },
+  { href: "/freight", label: "Freight", icon: Navigation },
+  { href: "/shipbuilding", label: "Shipbuilding", icon: Factory },
+  { href: "/forecasts", label: "Forecasts", icon: BarChart3 },
 ];
 
 export default function Navbar() {
@@ -54,10 +32,8 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -66,13 +42,9 @@ export default function Navbar() {
     setMobileOpen(false);
   }, [pathname]);
 
-  // Prevent body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -85,88 +57,67 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Navbar */}
+      {/* ── Navbar ── */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           scrolled
-            ? "bg-[#0F1F3D]/95 backdrop-blur-md shadow-lg shadow-black/20"
-            : "bg-[#0F1F3D]/90 backdrop-blur-sm"
+            ? "bg-white/95 backdrop-blur-sm shadow-sm"
+            : "bg-white"
         }`}
+        style={{ borderBottom: "1px solid #E2E8F0" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0">
-              <Image
-                src="/synergy_logo.png"
-                alt="Synergy Capital"
-                width={40}
-                height={40}
-                className="h-10 w-auto"
-                priority
-              />
-              <span className="text-[#F8FAFC] font-semibold text-lg hidden sm:block">
-                Synergy Capital
-              </span>
-            </Link>
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <Image
+              src="/synergy_logo.png"
+              alt="Synergy Capital"
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
+          {/* Desktop links */}
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map(({ href, label, icon: Icon }) => {
+              const active = isActive(href);
+              return (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive(link.href)
-                      ? "text-[#E8943A] bg-[#E8943A]/10"
-                      : "text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/5"
+                  key={href}
+                  href={href}
+                  className={`relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                    active
+                      ? "text-[#E8943A]"
+                      : "text-[#0F172A] hover:text-[#E8943A] hover:bg-[#FFF7ED]"
                   }`}
                 >
-                  <span
-                    className={
-                      isActive(link.href) ? "text-[#E8943A]" : "text-[#94A3B8]"
-                    }
-                  >
-                    {link.icon}
-                  </span>
-                  {link.label}
+                  <Icon size={16} strokeWidth={1.8} />
+                  {label}
+                  {/* Active underline */}
+                  {active && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-[#E8943A]" />
+                  )}
                 </Link>
-              ))}
-            </div>
-
-            {/* Mobile Hamburger Button */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/10 transition-colors"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            >
-              {mobileOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
+              );
+            })}
           </div>
-        </div>
 
-        {/* Active link indicator bar */}
-        <div className="hidden lg:block h-0.5 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1">
-            {navLinks.map((link) => (
-              <div
-                key={link.href}
-                className={`flex-1 h-0.5 rounded-full transition-all duration-300 ${
-                  isActive(link.href) ? "bg-[#E8943A]" : "bg-transparent"
-                }`}
-              />
-            ))}
-          </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden p-2 rounded-md text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu size={24} />
+          </button>
         </div>
       </nav>
 
-      {/* Mobile Overlay */}
+      {/* ── Mobile overlay ── */}
       <div
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -174,67 +125,69 @@ export default function Navbar() {
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Mobile Slide-out Drawer */}
+      {/* ── Mobile drawer (slides from right) ── */}
       <div
-        className={`fixed top-0 right-0 z-50 h-full w-72 bg-[#0A1628] shadow-2xl shadow-black/50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 right-0 z-50 h-full w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        {/* Drawer header */}
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: "1px solid #E2E8F0" }}
+        >
           <Link
             href="/"
-            className="flex items-center gap-3"
             onClick={() => setMobileOpen(false)}
+            className="flex items-center gap-2"
           >
             <Image
               src="/synergy_logo.png"
               alt="Synergy Capital"
-              width={32}
-              height={32}
-              className="h-8 w-auto"
+              width={100}
+              height={34}
+              className="h-[34px] w-auto object-contain"
             />
-            <span className="text-[#F8FAFC] font-semibold">
-              Synergy Capital
-            </span>
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
-            className="p-2 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/10 transition-colors"
+            className="p-2 rounded-md text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
             aria-label="Close menu"
           >
-            <X className="w-5 h-5" />
+            <X size={22} />
           </button>
         </div>
 
-        {/* Drawer Navigation Links */}
-        <div className="py-4 px-3 space-y-1 overflow-y-auto max-h-[calc(100vh-80px)]">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                isActive(link.href)
-                  ? "text-[#E8943A] bg-[#E8943A]/10 border-l-2 border-[#E8943A]"
-                  : "text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/5"
-              }`}
-            >
-              <span
-                className={
-                  isActive(link.href) ? "text-[#E8943A]" : "text-[#94A3B8]"
-                }
+        {/* Drawer links */}
+        <nav className="flex flex-col px-3 py-4 gap-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+          {navLinks.map(({ href, label, icon: Icon }) => {
+            const active = isActive(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                  active
+                    ? "bg-[#FFF7ED] text-[#E8943A] border-l-[3px] border-[#E8943A]"
+                    : "text-[#0F172A] hover:bg-[#F8FAFC] hover:text-[#E8943A]"
+                }`}
               >
-                {link.icon}
-              </span>
-              {link.label}
-            </Link>
-          ))}
+                <Icon size={18} strokeWidth={1.8} />
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Drawer footer */}
+        <div
+          className="absolute bottom-0 left-0 right-0 px-5 py-4"
+          style={{ borderTop: "1px solid #E2E8F0" }}
+        >
+          <p className="text-xs text-[#94A3B8]">Powered by Synergy Capital</p>
         </div>
       </div>
-
-      {/* Spacer to prevent content from hiding behind sticky navbar */}
-      <div className="h-16" />
     </>
   );
 }

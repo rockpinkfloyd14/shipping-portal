@@ -1,25 +1,21 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-navy-950: #0A1628;
-  --color-navy-900: #0F1F3D;
-  --color-navy-800: #152952;
-  --color-navy-700: #1B3A6B;
-  --color-navy-600: #234B84;
-  --color-ocean-500: #1E6091;
-  --color-ocean-400: #2980B9;
-  --color-ocean-300: #5DADE2;
+  --color-primary: #0A1628;
+  --color-primary-light: #1B3A6B;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F8FAFC;
+  --color-surface-hover: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-dark: #CBD5E1;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
   --color-synergy-orange: #E8943A;
   --color-synergy-coral: #E85D5D;
   --color-synergy-gold: #F0B860;
-  --color-slate-50: #F8FAFC;
-  --color-slate-100: #F1F5F9;
-  --color-slate-200: #E2E8F0;
-  --color-slate-300: #CBD5E1;
-  --color-slate-400: #94A3B8;
-  --color-slate-500: #64748B;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
+  --color-ocean: #2980B9;
+  --color-ocean-light: #5DADE2;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -29,8 +25,8 @@
 }
 
 body {
-  background: var(--color-navy-950);
-  color: #F8FAFC;
+  background: #F8FAFC;
+  color: #0F172A;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -39,14 +35,14 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-navy-950);
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-navy-700);
+  background: #CBD5E1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-ocean-500);
+  background: #94A3B8;
 }
 
 /* Gradient text utility */
@@ -63,25 +59,16 @@ body {
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
 /* Stat card glow */
 .stat-glow {
   position: relative;
+  transition: box-shadow 0.3s ease;
 }
-.stat-glow::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(232,148,58,0.3), rgba(232,93,93,0.3));
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.stat-glow:hover::before {
-  opacity: 1;
+.stat-glow:hover {
+  box-shadow: 0 0 0 1px rgba(232,148,58,0.3), 0 8px 24px rgba(232,148,58,0.1);
 }
 
 /* Image container with aspect ratio */
@@ -112,11 +99,89 @@ body {
   animation: gradient-shift 6s ease infinite;
 }
 
-/* Pulse animation for live indicators */
+/* Pulse animation */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
 .pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Fade in up animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(11) { animation-delay: 0.55s; }
+.stagger-children > *:nth-child(12) { animation-delay: 0.6s; }
+
+/* Count up animation for numbers */
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-count {
+  animation: countUp 0.4s ease-out forwards;
+}
+
+/* Bar chart animation */
+@keyframes growWidth {
+  from { width: 0%; }
+}
+.animate-bar {
+  animation: growWidth 1s ease-out forwards;
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Ship placeholder background */
+.ship-placeholder {
+  background: linear-gradient(135deg, #E2E8F0, #F1F5F9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Map styles */
+.rsm-geography {
+  outline: none;
+  transition: fill 0.2s ease;
+}
+.rsm-geography:hover {
+  fill: #E8943A !important;
 }
