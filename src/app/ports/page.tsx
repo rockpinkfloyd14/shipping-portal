@@ -366,10 +366,9 @@ export default function PortsPage() {
             </div>
 
             {/* Port Cards Grid */}
-            <h2 className="text-2xl font-bold text-[#0F172A] mb-2">
+            <h2 className="text-2xl font-bold text-[#0F172A] mb-6">
               All Major Ports
             </h2>
-            <p className="text-[#94A3B8] text-sm mb-6">Click on a port to see full details</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {majorPorts
                 .slice()
@@ -383,63 +382,79 @@ export default function PortsPage() {
                       initial="hidden"
                       animate="visible"
                       variants={cardVariants}
-                      layout
                       onClick={() =>
                         setSelectedPort(
                           selectedPort === port.name ? null : port.name
                         )
                       }
-                      className={`bg-white border rounded-2xl transition-all duration-300 cursor-pointer group relative overflow-hidden ${
+                      className={`bg-white border rounded-2xl p-6 transition-all duration-300 cursor-pointer group relative overflow-hidden ${
                         isSelected
                           ? "border-[#E8943A] shadow-lg shadow-[#E8943A]/10 ring-1 ring-[#E8943A]/20"
                           : "border-[#E2E8F0] hover:border-[#E8943A]/40 hover:shadow-md"
                       }`}
                     >
-                      {/* ── Collapsed: always visible ── */}
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-3">
-                          {/* Left: name & country */}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-[#0F172A] text-lg font-bold group-hover:text-[#E8943A] transition-colors truncate">
-                              {countryFlags[port.country] || ""} {port.name}
-                            </h3>
-                            <p className="text-[#94A3B8] text-sm">{port.country} &middot; {port.region}</p>
-                          </div>
-                          {/* Right: rank + chevron */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            <div
-                              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                port.rank <= 5
-                                  ? "bg-[#E8943A]/10 border border-[#E8943A]/30"
-                                  : "bg-[#2980B9]/10 border border-[#2980B9]/30"
-                              }`}
-                            >
-                              <span
-                                className={`font-bold text-sm ${
-                                  port.rank <= 5 ? "text-[#E8943A]" : "text-[#2980B9]"
-                                }`}
-                              >
-                                #{port.rank}
-                              </span>
-                            </div>
-                            <ChevronDown
-                              size={18}
-                              className={`text-[#94A3B8] transition-transform duration-300 ${
-                                isSelected ? "rotate-180 text-[#E8943A]" : ""
-                              }`}
-                            />
-                          </div>
-                        </div>
+                      {/* Rank Badge */}
+                      <div
+                        className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center ${
+                          port.rank <= 5
+                            ? "bg-[#E8943A]/10 border border-[#E8943A]/30"
+                            : "bg-[#2980B9]/10 border border-[#2980B9]/30"
+                        }`}
+                      >
+                        <span
+                          className={`font-bold text-sm ${
+                            port.rank <= 5 ? "text-[#E8943A]" : "text-[#2980B9]"
+                          }`}
+                        >
+                          #{port.rank}
+                        </span>
+                      </div>
 
-                        {/* Quick stats row */}
-                        <div className="flex items-center gap-4 mt-3 text-sm">
-                          <span className="text-[#0F172A] font-semibold">{port.volumeTEU}</span>
-                          <span className="text-[#CBD5E1]">|</span>
-                          <span className="text-[#475569]">{port.volumeTons}</span>
+                      {/* Port Name + Country */}
+                      <div className="mb-4 pr-12">
+                        <h3 className="text-[#0F172A] text-xl font-bold group-hover:text-[#E8943A] transition-colors">
+                          {countryFlags[port.country] || ""} {port.name}
+                        </h3>
+                        <p className="text-[#94A3B8] text-sm">{port.country}</p>
+                      </div>
+
+                      {/* Volume Stats */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
+                          <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">TEU Volume</p>
+                          <p className="text-[#0F172A] font-semibold text-sm">{port.volumeTEU}</p>
+                        </div>
+                        <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
+                          <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Tonnage</p>
+                          <p className="text-[#0F172A] font-semibold text-sm">{port.volumeTons}</p>
                         </div>
                       </div>
 
-                      {/* ── Expanded: details panel ── */}
+                      {/* Type Badge */}
+                      <div className="mb-3">
+                        <span className="inline-block px-3 py-1 rounded-full bg-[#2980B9]/10 text-[#2980B9] text-xs font-medium border border-[#2980B9]/20">
+                          {port.type}
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[#475569] text-sm leading-relaxed mb-4">
+                        {port.description}
+                      </p>
+
+                      {/* Key Trades */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {port.keyTrades.map((trade) => (
+                          <span
+                            key={trade}
+                            className="px-2.5 py-1 rounded-full bg-[#E8943A]/10 text-[#E8943A] text-xs font-medium border border-[#E8943A]/15"
+                          >
+                            {trade}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* ── Click to expand: extra details ── */}
                       <motion.div
                         initial={false}
                         animate={{
@@ -449,25 +464,8 @@ export default function PortsPage() {
                         transition={{ duration: 0.3, ease: "easeOut" as const }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-5 border-t border-[#E2E8F0]">
-                          {/* Volume Stats */}
-                          <div className="grid grid-cols-2 gap-3 mt-4">
-                            <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
-                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">TEU Volume</p>
-                              <p className="text-[#0F172A] font-bold text-lg">{port.volumeTEU}</p>
-                            </div>
-                            <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
-                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Cargo Tonnage</p>
-                              <p className="text-[#0F172A] font-bold text-lg">{port.volumeTons}</p>
-                            </div>
-                          </div>
-
-                          {/* Type + Region */}
-                          <div className="flex flex-wrap items-center gap-2 mt-4">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2980B9]/10 text-[#2980B9] text-xs font-medium border border-[#2980B9]/20">
-                              <Anchor size={12} />
-                              {port.type}
-                            </span>
+                        <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
+                          <div className="flex flex-wrap items-center gap-2 mb-3">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] text-[#475569] text-xs font-medium border border-[#E2E8F0]">
                               <Globe2 size={12} />
                               {port.region}
@@ -477,31 +475,31 @@ export default function PortsPage() {
                               {port.lat.toFixed(2)}&deg;, {port.lng.toFixed(2)}&deg;
                             </span>
                           </div>
-
-                          {/* Description */}
-                          <p className="text-[#475569] text-sm leading-relaxed mt-4">
-                            {port.description}
-                          </p>
-
-                          {/* Key Trades */}
-                          <div className="mt-4">
-                            <p className="flex items-center gap-1.5 text-[#94A3B8] text-xs uppercase tracking-wider font-semibold mb-2">
-                              <Package size={12} />
-                              Key Commodities
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {port.keyTrades.map((trade) => (
-                                <span
-                                  key={trade}
-                                  className="px-2.5 py-1 rounded-full bg-[#E8943A]/10 text-[#E8943A] text-xs font-medium border border-[#E8943A]/15"
-                                >
-                                  {trade}
-                                </span>
-                              ))}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-gradient-to-br from-[#E8943A]/5 to-[#E85D5D]/5 rounded-lg p-3 border border-[#E8943A]/10">
+                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Annual TEU</p>
+                              <p className="text-[#E8943A] font-bold text-lg">{port.volumeTEU}</p>
+                            </div>
+                            <div className="bg-gradient-to-br from-[#2980B9]/5 to-[#2980B9]/10 rounded-lg p-3 border border-[#2980B9]/10">
+                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Annual Tonnage</p>
+                              <p className="text-[#2980B9] font-bold text-lg">{port.volumeTons}</p>
                             </div>
                           </div>
                         </div>
                       </motion.div>
+
+                      {/* Expand hint */}
+                      <div className="flex items-center justify-center mt-4 pt-3 border-t border-[#F1F5F9]">
+                        <ChevronDown
+                          size={16}
+                          className={`text-[#94A3B8] transition-transform duration-300 ${
+                            isSelected ? "rotate-180 text-[#E8943A]" : ""
+                          }`}
+                        />
+                        <span className="text-[#94A3B8] text-xs ml-1">
+                          {isSelected ? "Less" : "More details"}
+                        </span>
+                      </div>
                     </motion.div>
                   );
                 })}
