@@ -12,7 +12,7 @@ import {
   Marker,
   Line,
 } from "react-simple-maps";
-import { Anchor, AlertTriangle, ArrowRight, Ship, MapPin, ChevronDown, Globe2, Package } from "lucide-react";
+import { Anchor, AlertTriangle, ArrowRight, Ship } from "lucide-react";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -373,25 +373,14 @@ export default function PortsPage() {
               {majorPorts
                 .slice()
                 .sort((a, b) => a.rank - b.rank)
-                .map((port, i) => {
-                  const isSelected = selectedPort === port.name;
-                  return (
+                .map((port, i) => (
                     <motion.div
                       key={port.name}
                       custom={i}
                       initial="hidden"
                       animate="visible"
                       variants={cardVariants}
-                      onClick={() =>
-                        setSelectedPort(
-                          selectedPort === port.name ? null : port.name
-                        )
-                      }
-                      className={`bg-white border rounded-2xl p-6 transition-all duration-300 cursor-pointer group relative overflow-hidden ${
-                        isSelected
-                          ? "border-[#E8943A] shadow-lg shadow-[#E8943A]/10 ring-1 ring-[#E8943A]/20"
-                          : "border-[#E2E8F0] hover:border-[#E8943A]/40 hover:shadow-md"
-                      }`}
+                      className="bg-white border border-[#E2E8F0] rounded-2xl p-6 transition-all duration-300 group relative overflow-hidden hover:border-[#E8943A]/40 hover:shadow-md"
                     >
                       {/* Rank Badge */}
                       <div
@@ -453,56 +442,8 @@ export default function PortsPage() {
                           </span>
                         ))}
                       </div>
-
-                      {/* ── Click to expand: extra details ── */}
-                      <motion.div
-                        initial={false}
-                        animate={{
-                          height: isSelected ? "auto" : 0,
-                          opacity: isSelected ? 1 : 0,
-                        }}
-                        transition={{ duration: 0.3, ease: "easeOut" as const }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
-                          <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] text-[#475569] text-xs font-medium border border-[#E2E8F0]">
-                              <Globe2 size={12} />
-                              {port.region}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] text-[#475569] text-xs font-medium border border-[#E2E8F0]">
-                              <MapPin size={12} />
-                              {port.lat.toFixed(2)}&deg;, {port.lng.toFixed(2)}&deg;
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-gradient-to-br from-[#E8943A]/5 to-[#E85D5D]/5 rounded-lg p-3 border border-[#E8943A]/10">
-                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Annual TEU</p>
-                              <p className="text-[#E8943A] font-bold text-lg">{port.volumeTEU}</p>
-                            </div>
-                            <div className="bg-gradient-to-br from-[#2980B9]/5 to-[#2980B9]/10 rounded-lg p-3 border border-[#2980B9]/10">
-                              <p className="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">Annual Tonnage</p>
-                              <p className="text-[#2980B9] font-bold text-lg">{port.volumeTons}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-
-                      {/* Expand hint */}
-                      <div className="flex items-center justify-center mt-4 pt-3 border-t border-[#F1F5F9]">
-                        <ChevronDown
-                          size={16}
-                          className={`text-[#94A3B8] transition-transform duration-300 ${
-                            isSelected ? "rotate-180 text-[#E8943A]" : ""
-                          }`}
-                        />
-                        <span className="text-[#94A3B8] text-xs ml-1">
-                          {isSelected ? "Less" : "More details"}
-                        </span>
-                      </div>
                     </motion.div>
-                  );
-                })}
+                ))}
             </div>
           </motion.div>
         )}
