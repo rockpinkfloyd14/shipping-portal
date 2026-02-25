@@ -72,9 +72,9 @@ export default function Navbar() {
             <Image
               src="/synergy_logo.png"
               alt="Synergy Capital"
-              width={180}
-              height={56}
-              className="h-14 w-auto object-contain"
+              width={220}
+              height={72}
+              className="h-[72px] w-auto object-contain -my-4"
               priority
             />
           </Link>
