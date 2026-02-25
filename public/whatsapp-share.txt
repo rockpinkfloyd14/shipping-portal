@@ -1,1 +1,3 @@
-Synergy Capital presents the Shipping Industry Portal - your comprehensive guide to global maritime trade. Explore vessel types from Capesize bulk carriers to Ultra Large Container Ships, interactive world maps with major ports and trade routes, live freight rate indices, commodity volumes, shipbuilding and ship-breaking market data, and expert industry forecasts. Everything you need to understand the shipping industry in one place. Visit now: https://shipping-portal-two.vercel.app
+Presenting to you the Shipping Industry Portal by Synergy Capital. Spend 10 minutes here and you'll understand 80% of how the global shipping industry works. Explore vessel types, major ports, trade routes, freight rates, market data, shipbuilding trends, and expert forecasts - all in one place. Desktop viewing highly recommended for the best experience with interactive maps and charts.
+
+https://shipping-portal-two.vercel.app

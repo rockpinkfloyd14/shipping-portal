@@ -22,11 +22,21 @@ export const metadata: Metadata = {
     description: "Your complete guide to the global shipping industry - vessel types, ports, routes, freight rates, market data, and forecasts.",
     type: "website",
     siteName: "Synergy Capital",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Shipping Industry Portal | Synergy Capital",
+        type: "image/jpeg",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Shipping Industry Portal | Synergy Capital",
     description: "Your complete guide to the global shipping industry - vessel types, ports, routes, freight rates, market data, and forecasts.",
+    images: ["/og-image.jpg"],
   },
 };
 
